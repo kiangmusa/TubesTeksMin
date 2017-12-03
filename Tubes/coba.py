@@ -1,8 +1,5 @@
 from __future__ import division
-myname = "Angky"
-
 import nltk
-
 from bs4 import BeautifulSoup as BS
 from xml.etree import cElementTree as ET
 import xml.dom.minidom
@@ -18,20 +15,24 @@ from nltk.tokenize import word_tokenize
 kelas = 'B:/Kul/Teksmin/dataset/topic/Training101.txt'
 testfolder = 'B:/Kul/Teksmin/dataset/topic/Test101.txt'
 
-#Mengambil data
+#Mengambil data nama folder untuk data tes dan training
+#data tes
 buka = open(testfolder,"r")
 ambil = buka.readlines()
 testset=[]
 for i in ambil:
     a = i.split()
     testset.append(a)
-#Training
+
+#data training
 buka = open(kelas,"r")
 ambil = buka.readlines()
 b=[]
 for i in ambil:
     a = i.split()
     b.append(a)
+
+#menghitung probabilitas dari kelas 0 dan 1
 d=[0,1]
 jum1 = len(b)
 for i in range(0, jum1-1):
@@ -42,8 +43,12 @@ for i in range(0, jum1-1):
 
 d[0] = d[0]/jum1
 d[1] = d[1]/jum1
+
+
 itr = 0
 dict = {'0':"",'1':""}
+
+#TRAINING
 for item in b:
     file = 'B:/Kul/Teksmin/dataset/Training101/'+b[itr][1]+'.xml'
 #Mengambil isi data pada teks data Training
@@ -59,8 +64,12 @@ for item in b:
     else:
         dict['1'] += l
     itr += 1
+
+#Tokenisasi data training
 dict['0'] = nltk.word_tokenize(dict['0'].casefold())
 dict['1'] = nltk.word_tokenize(dict['1'].casefold())
+
+#Stemming data training
 ps = PorterStemmer()
 stem0 = []
 stem1 = []
@@ -68,6 +77,8 @@ for w in dict['0']:
     stem0.append(ps.stem(w))
 for w in dict['1']:
     stem1.append(ps.stem(w))
+
+#Proses stop words
 stop_words = set(stopwords.words('english'))
 filter0 = []
 filter1 = []
@@ -77,7 +88,6 @@ for w in stem0:
 for w in stem1:
     if w not in stop_words:
         filter1.append(w)
-
 punctuations = list(string.punctuation)
 punc0 = [];
 punc1 = [];
@@ -87,13 +97,18 @@ for w in filter0:
 for w in filter1:
     if w not in punctuations:
         punc1.append(w)
+
+#Proses perhitungan jumlah kemunculan kata
 TotalKata0 = len(punc0)
 TotalKata1 = len(punc1)
+
 c0 = {}
 c1 = {}
+
 listTag0 = set()
 listTag1 = set()
 listTag = set()
+
 for w in punc0:
     try:
         listTag0.add(w)
@@ -103,8 +118,8 @@ for w in punc0:
         listTag.add(w)
     except:
         pass
+
 for item in listTag0:
-    c0[item] = {}
     c0[item] = 0
 
 for w in punc0:
@@ -120,15 +135,14 @@ for w in punc1:
     except:
         pass
 for item in listTag1:
-    c1[item] = {}
     c1[item] = 0
 
 for w in punc1:
     c1[w] += 1
-Hasil = []
 
+Hasil = []
 TotalKata = len(listTag)
-# print(TotalKata, TotalKata0, TotalKata1)
+
 #TESTING
 itr = 0
 for test in testset:
@@ -142,7 +156,6 @@ for test in testset:
         l = (link.get_text())
     ab = l.casefold()
     tokens= nltk.word_tokenize(ab)
-    # print(tokens)
     ps = PorterStemmer()
     stemming = []
     for w in tokens:
@@ -152,13 +165,11 @@ for test in testset:
     for w in stemming:
         if w not in stop_words:
             filtered_sentence.append(w)
-    # print(filtered_sentence)
     punctuations = list(string.punctuation)
-    punc = [];
+    punc = []
     for w in filtered_sentence:
         if w not in punctuations:
             punc.append(w)
-    # print(punc[1])
     c = {}
     listTag = set()
     for w in punc:
@@ -167,13 +178,14 @@ for test in testset:
         except:
             pass
     for item in listTag:
-        c[item] = {}
         c[item]= 0
 
     for w in punc:
         c[w]+=1
 
     hasil0 = 0
+
+#Proses Perhitungan Probabilitas kata dari dokumen untuk tiap kelas
     for item in listTag:
         try:
             x = c0[item]+1
@@ -198,17 +210,15 @@ for test in testset:
             z = c[item]
             hasil1 = hasil1+math.log1p((x / y) ** z)
 
-    if(hasil0>=hasil1):
+#Proses membandingkan besar probabilitas kedua kelas
+    if((hasil0+math.log1p(d[0]))>=(hasil1+math.log1p(d[1]))):
         Hasil.append("0")
     else:
         Hasil.append("1")
     itr+=1
 akurasi = 0
+
 for i in range(0,len(testset)-1):
     if(testset[i][2]==Hasil[i]):
         akurasi+=1
 print("%d %%" % (akurasi/len(testset)*100))
-# for item in c:
-#     c[item][1]=c[item][0]
-
-# print(dict['0'])
