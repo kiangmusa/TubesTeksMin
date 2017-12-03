@@ -101,7 +101,7 @@ for w in filter1:
 #Proses perhitungan jumlah kemunculan kata
 TotalKata0 = len(punc0)
 TotalKata1 = len(punc1)
-
+print(TotalKata0, TotalKata1)
 c0 = {}
 c1 = {}
 
@@ -211,7 +211,8 @@ for test in testset:
             hasil1 = hasil1+math.log1p((x / y) ** z)
 
 #Proses membandingkan besar probabilitas kedua kelas
-    if((hasil0+math.log1p(d[0]))>=(hasil1+math.log1p(d[1]))):
+    if(hasil0>=hasil1):
+    #if((hasil0+math.log1p(d[0]))>=(hasil1+math.log1p(d[1]))):
         Hasil.append("0")
     else:
         Hasil.append("1")
@@ -222,3 +223,9 @@ for i in range(0,len(testset)-1):
     if(testset[i][2]==Hasil[i]):
         akurasi+=1
 print("%d %%" % (akurasi/len(testset)*100))
+
+HasilTesting = 'B:/Kul/GIT/Tubes/Hasil.txt'
+fh = open(HasilTesting,"w")
+for i in range(0,len(Hasil)):
+    fh.writelines(Hasil[i])
+fh.close()
