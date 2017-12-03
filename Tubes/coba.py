@@ -44,6 +44,8 @@ for i in range(0, jum1-1):
 d[0] = d[0]/jum1
 d[1] = d[1]/jum1
 
+print(d[0], d[1])
+
 
 itr = 0
 dict = {'0':"",'1':""}
@@ -59,6 +61,7 @@ for item in b:
     a = soup.find_all('text')
     for link in a:
         l = (link.get_text())
+    #print(l)
     if(b[itr][2]=="0"):
         dict['0'] += l
     else:
@@ -68,7 +71,7 @@ for item in b:
 #Tokenisasi data training
 dict['0'] = nltk.word_tokenize(dict['0'].casefold())
 dict['1'] = nltk.word_tokenize(dict['1'].casefold())
-
+#print(dict['0'])
 #Stemming data training
 ps = PorterStemmer()
 stem0 = []
@@ -77,7 +80,7 @@ for w in dict['0']:
     stem0.append(ps.stem(w))
 for w in dict['1']:
     stem1.append(ps.stem(w))
-
+#print(stem0)
 #Proses stop words
 stop_words = set(stopwords.words('english'))
 filter0 = []
@@ -97,7 +100,7 @@ for w in filter0:
 for w in filter1:
     if w not in punctuations:
         punc1.append(w)
-
+print(punc0)
 #Proses perhitungan jumlah kemunculan kata
 TotalKata0 = len(punc0)
 TotalKata1 = len(punc1)
@@ -142,7 +145,7 @@ for w in punc1:
 
 Hasil = []
 TotalKata = len(listTag)
-
+print(c0)
 #TESTING
 itr = 0
 for test in testset:
@@ -227,5 +230,5 @@ print("%d %%" % (akurasi/len(testset)*100))
 HasilTesting = 'B:/Kul/GIT/Tubes/Hasil.txt'
 fh = open(HasilTesting,"w")
 for i in range(0,len(Hasil)):
-    fh.writelines(Hasil[i])
+    fh.write(Hasil[i]+"\n")
 fh.close()
